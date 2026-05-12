@@ -5,7 +5,7 @@ import logging
 import json
 import config
 from pipeline.client import GitHubClient, GitHubAPIError
-from normalize_data import normalize_to_csv
+from pipeline.normalize_data import normalize_to_csv
 
 # Configure production-grade logging
 logging.basicConfig(

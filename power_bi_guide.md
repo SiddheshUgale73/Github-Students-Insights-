@@ -10,7 +10,7 @@ Follow these steps to connect your GitHub dataset to Power BI for real-time anal
 
 ### 1. Get Connection Details
 Use the following details from your `.env` file:
-- **Server**: `gnitsrf-ar75548.snowflakecomputing.com` (Account URL)
+- **Server**: `UXOHCBS-AT33722.snowflakecomputing.com` (Account URL)
 - **Warehouse**: `COMPUTE_WH`
 - **Database**: `GITSTAR_DB`
 - **Schema**: `PUBLIC`
@@ -18,15 +18,15 @@ Use the following details from your `.env` file:
 ### 2. Connect in Power BI
 1.  Open Power BI Desktop.
 2.  Click **Get Data** -> **More...** -> **Database** -> **Snowflake**.
-3.  **Server**: Enter `gnitsrf-ar75548.snowflakecomputing.com`.
+3.  **Server**: Enter `UXOHCBS-AT33722.snowflakecomputing.com`.
 4.  **Warehouse**: Enter `COMPUTE_WH`.
 5.  **Data Connectivity Mode**: Select **DirectQuery** (for real-time updates).
 6.  Click **OK**.
 
 ### 3. Authentication
 1.  Select **Database** authentication.
-2.  **User name**: `SIDDHESH123`
-3.  **Password**: `Siddhesh@123456789`
+2.  **User name**: `GITHUBIINSIGHTS2026`
+3.  **Password**: `Githubiinsights@2026`
 4.  Click **Connect**.
 
 ### 4. Select Views

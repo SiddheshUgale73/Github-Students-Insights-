@@ -17,14 +17,14 @@ RETRY_STATUS_CODES = [429, 500, 502, 503, 504]
 PROACTIVE_RATE_LIMIT_THRESHOLD = 10  # Wait if remaining requests are below this
 
 # File Paths
-RAW_DATA_FILE = "github_raw_data.json"
-USERS_CSV_FILE = "users.csv"
-USER_TYPES_CSV_FILE = "user_types.csv"
-REPOS_CSV_FILE = "repositories.csv"
-LANGUAGES_CSV_FILE = "languages.csv"
-COMMITS_CSV_FILE = "commits.csv"
-AUTHORS_CSV_FILE = "authors.csv"
-PRS_CSV_FILE = "pull_requests.csv"
+RAW_DATA_FILE = "data/github_raw_data.json"
+USERS_CSV_FILE = "data/users.csv"
+USER_TYPES_CSV_FILE = "data/user_types.csv"
+REPOS_CSV_FILE = "data/repositories.csv"
+LANGUAGES_CSV_FILE = "data/languages.csv"
+COMMITS_CSV_FILE = "data/commits.csv"
+AUTHORS_CSV_FILE = "data/authors.csv"
+PRS_CSV_FILE = "data/pull_requests.csv"
 LOG_FILE = "pipeline.log"
 
 # Search Settings

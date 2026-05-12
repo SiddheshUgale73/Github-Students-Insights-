@@ -3,8 +3,8 @@ import snowflake.connector
 from dotenv import load_dotenv
 import logging
 
-# Load environment variables
-load_dotenv()
+# Load environment variables (one level up)
+load_dotenv(os.path.join(os.path.dirname(__file__), '..', '.env'))
 
 # Configure Logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -37,7 +37,8 @@ def create_views():
         cursor = conn.cursor()
         
         logger.info("Reading power_bi_views.sql...")
-        with open('power_bi_views.sql', 'r') as f:
+        views_path = os.path.join(os.path.dirname(__file__), 'power_bi_views.sql')
+        with open(views_path, 'r') as f:
             sql_queries = f.read().split(';')
             
         for query in sql_queries:

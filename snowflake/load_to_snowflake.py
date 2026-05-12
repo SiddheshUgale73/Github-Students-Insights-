@@ -3,8 +3,8 @@ import logging
 import snowflake.connector
 from dotenv import load_dotenv
 
-# Load environment variables from .env
-load_dotenv()
+# Load environment variables from .env (one level up)
+load_dotenv(os.path.join(os.path.dirname(__file__), '..', '.env'))
 
 # Configure Logging
 logging.basicConfig(
@@ -49,8 +49,9 @@ def get_snowflake_connection():
 def setup_tables(conn):
     """Execute the DDL script to create all necessary tables."""
     logger.info("Setting up Snowflake tables from snowflake_ddl.sql...")
+    ddl_path = os.path.join(os.path.dirname(__file__), 'snowflake_ddl.sql')
     try:
-        with open('snowflake_ddl.sql', 'r') as f:
+        with open(ddl_path, 'r') as f:
             sql_queries = f.read().split(';')
             
         cursor = conn.cursor()
@@ -65,14 +66,15 @@ def setup_tables(conn):
 def load_csv_data(conn):
     """Upload CSVs to internal stages and COPY INTO tables."""
     # Loading order matters for Foreign Keys! (Parents -> Children)
+    data_dir = os.path.join(os.path.dirname(__file__), '..', 'data')
     tables_to_load = [
-        ("USER_TYPES", "user_types.csv"),
-        ("USERS", "users.csv"),
-        ("LANGUAGES", "languages.csv"),
-        ("REPOSITORIES", "repositories.csv"),
-        ("AUTHORS", "authors.csv"),
-        ("COMMITS", "commits.csv"),
-        ("PULL_REQUESTS", "pull_requests.csv")
+        ("USER_TYPES", os.path.join(data_dir, "user_types.csv")),
+        ("USERS", os.path.join(data_dir, "users.csv")),
+        ("LANGUAGES", os.path.join(data_dir, "languages.csv")),
+        ("REPOSITORIES", os.path.join(data_dir, "repositories.csv")),
+        ("AUTHORS", os.path.join(data_dir, "authors.csv")),
+        ("COMMITS", os.path.join(data_dir, "commits.csv")),
+        ("PULL_REQUESTS", os.path.join(data_dir, "pull_requests.csv"))
     ]
     
     cursor = conn.cursor()

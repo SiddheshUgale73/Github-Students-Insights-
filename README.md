@@ -1,22 +1,30 @@
-# GitHub Projects Insights: AI-Powered Academic Project Monitoring
+# 🎓 GitHub Students Insights
 
-A high-performance Data Engineering pipeline designed to help **Mentors and Guides** track student project progress by extracting data from GitHub, normalizing it in **Snowflake**, and applying **AI models** to detect fatigue and project momentum.
+An end-to-end **Data Engineering & AI pipeline** that extracts GitHub activity data, loads it into **Snowflake**, and applies **Machine Learning models** to help academic mentors monitor student project progress — with final analytics delivered via **Power BI**.
 
-## 🚀 Overview
-This project provides a comprehensive overview of student activity across hundreds of repositories. It uses advanced analytics to turn raw git metadata into actionable insights for academic evaluation (300-mark college projects).
+---
 
-## 🏗 Architecture & Workflow
+## 🏗 Architecture
 
-### 1. Data Extraction (Python)
-The `main.py` orchestrator performs a deep-crawl of the GitHub API.
-- **Resumable ETL**: Automatically resumes from the last processed user if interrupted.
-- **Incremental Saving**: Saves progress after every user to prevent data loss.
-- **Rich Data Scope**: Extracts Profiles, Repositories, Commits (limit 100/repo), and Pull Requests (limit 50/repo).
+```
+GitHub API  →  Extract (Python)  →  CSVs  →  Snowflake  →  Power BI
+                                              ↓
+                                         ML Models  →  Streamlit Dashboard
+```
 
-### 2. Complex Normalization (7 Tables)
-The `normalize_data.py` script transforms nested JSON into a relational structure ready for **Snowflake**.
+| Stage | Tool | Description |
+|---|---|---|
+| **Extract** | Python + GitHub REST API | Deep-crawl user profiles, repos, commits, PRs |
+| **Transform** | `normalize_data.py` | Flatten nested JSON into 7 normalized CSV tables |
+| **Load** | Snowflake Connector | Auto-create schema & bulk-load CSVs into cloud warehouse |
+| **Schedule** | Snowflake Tasks (CRON) | Automated data quality checks & analytics refresh |
+| **Analyze** | Power BI (DirectQuery) | Real-time dashboards connected to Snowflake |
+| **ML Insights** | scikit-learn + Streamlit | Burnout detection, PR prediction, project grading |
 
-#### 📊 Database Schema (ER Diagram)
+---
+
+## 📊 Database Schema
+
 ```mermaid
 erDiagram
     USER_TYPES ||--o{ USERS : "categorizes"
@@ -76,109 +84,153 @@ erDiagram
     }
 ```
 
-- **Schema Tables**:
-  - `USER_TYPES`: Categorizes accounts (User vs Organization).
-  - `USERS`: Detailed contributor profiles.
-  - `LANGUAGES`: Unique programming languages across all repos.
-  - `REPOSITORIES`: Metadata for 12,000+ repositories.
-  - `AUTHORS`: Unique Git authors across 500k+ commits.
-  - `COMMITS`: Transactional commit history.
-  - `PULL_REQUESTS`: Full lifecycle tracking (Open/Closed/Merged).
+---
 
-### 3. Automated Cloud Data Warehousing
-The `load_to_snowflake.py` script automatically creates the DDL schema and pushes all 500,000+ extracted rows into a live Snowflake cloud database using secure Python connectors.
+## 🤖 Machine Learning Models
 
-### 4. Machine Learning for Academic Monitoring (`ml/`)
-We utilize the Snowflake data to train predictive Python models that provide actionable insights to Mentors:
-1. **Student Fatigue Predictor:** An Isolation Forest model that flags students at risk of overwork based on late-night and weekend commit patterns.
-2. **Submission Timeline Predictor:** A Random Forest Regressor that predicts how long it takes for a student's submission (PR) to be reviewed.
-3. **Project Progress Scorer:** A K-Means clustering algorithm that grades projects from A (Excellent Progress) to F (Stalled) based on activity and consistency.
+| Model | Algorithm | Purpose |
+|---|---|---|
+| **Student Fatigue Predictor** | Isolation Forest | Flags students at risk of burnout based on late-night & weekend commit patterns |
+| **Submission Timeline Predictor** | Random Forest Regressor | Predicts how many days a PR will take to get reviewed and merged |
+| **Project Progress Scorer** | K-Means Clustering | Grades projects from A (Excellent) to F (Stalled) based on activity & consistency |
+| **Advanced Analytics** | Statistical Analysis | Collaboration scores, bus factor warnings, velocity tracking |
 
-### 5. Mentor Dashboard (`dashboard/`)
-A live **Streamlit** application designed for Guides to monitor student progress, check fatigue alerts, and view strategic project insights.
+---
 
-### 📊 Power BI Visualization
-The final step of the pipeline is data visualization using **Power BI**. 
+## 📁 Project Structure
 
-### 1. Connecting to Snowflake
-1.  **Open Power BI Desktop**.
-2.  Click on **Get Data** > **Database** > **Snowflake**.
-3.  **Server**: Enter your Snowflake account URL.
-4.  **Warehouse**: Specify your Snowflake warehouse name (e.g., `COMPUTE_WH`).
-5.  **Authentication**: Select **Database** and enter your Snowflake credentials.
-6.  **Navigator**: Select the tables created by `snowflake_ddl.sql` (USERS, REPOSITORIES, COMMITS, etc.).
+```
+Github-Students-Insights/
+│
+├── main.py                      # ETL orchestrator — entry point
+├── config.py                    # Configuration & environment variables
+├── requirements.txt             # Python dependencies
+├── .env                         # Credentials (gitignored)
+│
+├── pipeline/                    # GitHub API extraction layer
+│   ├── __init__.py
+│   ├── client.py                # GitHub REST API client with retry & rate limiting
+│   └── normalize_data.py        # JSON → 7 normalized CSV tables
+│
+├── snowflake/                   # Snowflake data warehouse layer
+│   ├── load_to_snowflake.py     # Auto-creates DB, schema, tables & loads CSVs
+│   ├── create_snowflake_views.py# Creates Power BI-ready views
+│   ├── snowflake_ddl.sql        # Table definitions (DDL)
+│   ├── snowflake_tasks.sql      # CRON-scheduled tasks for automated refresh
+│   └── power_bi_views.sql       # View definitions for dashboards
+│
+├── ml/                          # Machine Learning models & reports
+│   ├── train_suite.py           # Orchestrator — trains all models
+│   ├── predict_burnout.py       # Student fatigue detection
+│   ├── predict_pr_merge.py      # PR merge time prediction
+│   ├── repo_health_score.py     # Project progress grading
+│   └── advanced_analytics.py    # Collaboration & velocity analytics
+│
+├── dashboard/                   # Streamlit web dashboard
+│   └── app.py                   # Mentor support interface
+│
+├── data/                        # Extracted data files (gitignored)
+│   ├── github_raw_data.json     # Raw API responses
+│   ├── commits.csv              # ~146K commits
+│   ├── pull_requests.csv        # ~30K pull requests
+│   ├── repositories.csv         # ~3.3K repositories
+│   └── ...                      # users, authors, languages, user_types
+│
+└── docs/                        # Documentation
+    ├── power_bi_guide.md        # Power BI + Snowflake connection guide
+    └── final_project_report.md  # Project report
+```
 
-### 2. Data Modeling & DAX Measures
-Create a **Star Schema** in the Model view and add these key measures:
-- **Total Repositories**: `COUNTROWS('REPOSITORIES')`
-- **Avg Stars per Repo**: `AVERAGE('REPOSITORIES'[STAR_COUNT])`
-- **Total Commits**: `COUNTROWS('COMMITS')`
-- **Total Contributors**: `DISTINCTCOUNT('COMMITS'[AUTHOR_ID])`
-
-### 3. Suggested Insights
-| Metric | Suggested Visual |
-| :--- | :--- |
-| **Top Languages by Star Count** | Treemap or Bar Chart |
-| **Commits Over Time** | Line Chart or Area Chart |
-| **Language Popularity** | Pie Chart or Donut Chart |
-| **Repository Size vs Stars** | Scatter Plot |
-| **Contributor Activity** | Clustered Column Chart |
-
-### 3. Snowflake Integration
-The project includes a ready-to-use **`snowflake_ddl.sql`** script to set up your cloud data warehouse in seconds.
+---
 
 ## 🛠 Setup & Usage
 
 ### Prerequisites
-- Python 3.8+
-- GitHub Personal Access Token (PAT)
-- Snowflake Account
+- Python 3.10+
+- GitHub Personal Access Token ([create one](https://github.com/settings/tokens))
+- Snowflake Account (free trial works)
+- Power BI Desktop
 
 ### Installation
-1. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-2. Configure your `.env` file:
-   ```env
-   GITHUB_TOKEN=your_token_here
-   ```
 
-### Running the Pipeline
-1. **Extract Raw Data**:
-   ```bash
-   python main.py
-   ```
-2. **Normalize for Snowflake**:
-   ```bash
-   python normalize_data.py
-   ```
-3. **Load to Snowflake**:
-   ```bash
-   python load_to_snowflake.py
-   ```
-   *(Ensure `SNOWFLAKE_USER`, `SNOWFLAKE_ACCOUNT`, and `SNOWFLAKE_PASSWORD` are set in your `.env`)*
-4. **Train the Machine Learning Suite**:
-   ```bash
-   cd ml
-   python train_suite.py
-   cd ..
-   ```
+```bash
+pip install -r requirements.txt
+```
 
-5. **Launch the Analytics Web Dashboard**:
-   ```bash
-   cd dashboard
-   streamlit run app.py
-   ```
-## 📁 Project Structure
-- `main.py`: The GitHub API ETL Orchestrator.
-- `normalize_data.py`: The Transformation Engine.
-- `load_to_snowflake.py`: Automated Cloud Database uploader.
-- `ml/`: Enterprise Machine Learning Models (Burnout, PRs, Repo Health).
-- `dashboard/`: Streamlit Web Application for ML Visualization.
-- `pipeline/`: Core GitHub API client package.
-- `snowflake_ddl.sql`: Snowflake table definitions.
-- `config.py`: Global settings and file paths.
+### Configure `.env`
+
+```env
+GITHUB_TOKEN=your_github_token
+
+SNOWFLAKE_USER=your_username
+SNOWFLAKE_PASSWORD=your_password
+SNOWFLAKE_ACCOUNT=your_account_identifier
+SNOWFLAKE_WAREHOUSE=COMPUTE_WH
+SNOWFLAKE_DATABASE=GITSTAR_DB
+SNOWFLAKE_SCHEMA=PUBLIC
+```
+
+### Run the Pipeline
+
+```bash
+# Step 1: Extract data from GitHub → generates CSVs
+python main.py
+
+# Step 2: Load CSVs into Snowflake (auto-creates DB, schema & tables)
+python snowflake/load_to_snowflake.py
+
+# Step 3: Create Power BI views in Snowflake
+python snowflake/create_snowflake_views.py
+
+# Step 4: Train ML models
+cd ml && python train_suite.py && cd ..
+
+# Step 5: Launch Mentor Dashboard
+streamlit run dashboard/app.py
+```
+
+### Snowflake Scheduled Tasks
+Run `snowflake/snowflake_tasks.sql` in your Snowflake worksheet to activate:
+- **Daily** data quality checks (6 AM IST)
+- **Every 6 hours** analytics cache refresh
+- **Weekly** commit trend summaries (Monday 7 AM IST)
 
 ---
-**Monitor and guide your students effectively with GitHub Projects Insights!**
+
+## 📊 Power BI Integration
+
+Connect Power BI to Snowflake using DirectQuery for real-time dashboards:
+
+1. **Get Data** → **Snowflake**
+2. **Server**: `your-account.snowflakecomputing.com`
+3. **Warehouse**: `COMPUTE_WH`
+4. Select views: `DASHBOARD_REPO_SUMMARY`, `DASHBOARD_COMMIT_TRENDS`, `DASHBOARD_PR_INSIGHTS`
+
+See [`docs/power_bi_guide.md`](docs/power_bi_guide.md) for detailed instructions.
+
+### Suggested Visuals
+
+| Metric | Visual Type |
+|---|---|
+| Commit Velocity Over Time | Line Chart |
+| Language Distribution | Pie / Donut Chart |
+| PR Review Efficiency | Gauge / KPI Card |
+| Top Contributors | Bar Chart |
+| Repository Stars vs Forks | Scatter Plot |
+
+---
+
+## 🎓 Mentor Dashboard
+
+The Streamlit dashboard provides 4 tabs:
+
+| Tab | Feature |
+|---|---|
+| 🏗️ **Project Progress** | A–F grading for all student projects with search |
+| 🔥 **Student Fatigue Alert** | Flags overworked students needing mentor attention |
+| ⏳ **Submission Predictor** | Predicts PR merge time with interactive form |
+| 📊 **Strategy Insights** | Collaboration scores, velocity, risk heatmaps |
+
+---
+
+**Built with ❤️ for academic mentors to effectively guide and monitor student projects.**

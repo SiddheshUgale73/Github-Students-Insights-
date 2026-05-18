@@ -1,0 +1,17 @@
+{
+    "name": "GitHub Students Insights",
+    "dataColors": ["#58A6FF", "#3FB950", "#D29922", "#F85149", "#BC8CFF", "#79C0FF", "#7EE787", "#FFA657"],
+    "background": "#0D1117",
+    "foreground": "#C9D1D9",
+    "tableAccent": "#58A6FF",
+    "visualStyles": {
+        "*": {
+            "*": {
+                "background": [{"color": {"solid": {"color": "#161B22"}}}],
+                "border": [{"color": {"solid": {"color": "#30363D"}}}],
+                "title": [{"fontColor": {"solid": {"color": "#C9D1D9"}}}],
+                "labels": [{"color": {"solid": {"color": "#8B949E"}}}]
+            }
+        }
+    }
+}

@@ -246,6 +246,66 @@ with tab2:
                     st.error(f"**{row['NAME']}**\n- {', '.join(reason)}")
             else:
                 st.success("No critical project risks detected at this time.")
+                
+        # --- AI MENTOR ADVISORY PANEL ---
+        st.divider()
+        st.subheader("🧠 AI Mentor Diagnostic Advisor")
+        st.markdown("Select any repository below to generate a real-time, context-aware artificial intelligence diagnosis and recommended action plan for mentoring.")
+        
+        project_names = sorted(adv_df['NAME'].tolist())
+        selected_project = st.selectbox("Select Project for AI Diagnosis:", project_names, key="ai_diag_select")
+        
+        if selected_project:
+            # Look up project parameters
+            p_adv = adv_df[adv_df['NAME'] == selected_project].iloc[0]
+            collab_score = p_adv['COLLABORATION_SCORE']
+            dependence_pct = p_adv['DEPENDENCE_ON_TOP_STUDENT']
+            inactivity_days = p_adv['INACTIVITY_DAYS']
+            velocity = p_adv['VELOCITY']
+            
+            # Find K-Means grade
+            status_grade = "N/A"
+            if not repo_df.empty:
+                r_match = repo_df[repo_df['NAME'] == selected_project]
+                if not r_match.empty:
+                    status_grade = r_match.iloc[0]['status_grade']
+            
+            # Diagnostic analysis rules
+            diag_title = "✅ Project is Operating Smoothly"
+            diag_impact = "No severe free-riding, stagnation, or development issues detected."
+            diag_action = "Encourage the team to continue their current pace, focus on writing robust unit tests, and prepare polished documentation."
+            diag_color = "success"
+            
+            if inactivity_days > 14:
+                diag_title = "🚨 Development Stagnation Alert!"
+                diag_impact = f"Absolutely no commits or PR updates have been logged in {inactivity_days} days. The project development has completely stalled."
+                diag_action = "Schedule an emergency 1-on-1 check-in with the team. Require them to submit a recovery sprint plan detailing deliverables for the next 7 days."
+                diag_color = "error"
+            elif dependence_pct > 70 and collab_score <= 2:
+                diag_title = "⚠️ High Silo Risk & Individual Dependency"
+                diag_impact = f"One student is single-handedly carrying the repository ({dependence_pct:.1f}% commits). Other team members show negligible efforts."
+                diag_action = "Mandate a contribution redistribution. Require that the next 3 features or pull requests be authored exclusively by non-leading team members to balance marks."
+                diag_color = "warning"
+            elif velocity < 2.0 and ("C" in status_grade or "D/F" in status_grade):
+                diag_title = "⚠️ Low Development Velocity & Momentum"
+                diag_impact = f"Update frequency is extremely low ({velocity:.1f} commits/week) and the cluster progress grade is '{status_grade}'."
+                diag_action = "Conduct a scope review. The current project scope might be too complex or poorly defined. Help the students break down tasks into smaller, manageable weekly milestones."
+                diag_color = "warning"
+            elif collab_score >= 3 and inactivity_days <= 7 and dependence_pct < 50:
+                diag_title = "⭐ Outstanding Team Synergy & Health"
+                diag_impact = f"Work is excellently distributed among {collab_score} active team members, keeping a highly consistent pacing velocity of {velocity:.1f} commits/week."
+                diag_action = "Commend the group! Challenge them to focus on advanced optimizations, performance benchmarking, and preparing a stellar live demonstration."
+                diag_color = "success"
+                
+            # Render visual box
+            with st.container():
+                st.markdown(f"#### {diag_title}")
+                if diag_color == "error":
+                    st.error(f"**Critical Impact**: {diag_impact}\n\n**Mentor Action Plan**: {diag_action}")
+                elif diag_color == "warning":
+                    st.warning(f"**Diagnostic Alert**: {diag_impact}\n\n**Mentor Action Plan**: {diag_action}")
+                else:
+                    st.success(f"**Health Summary**: {diag_impact}\n\n**Mentor Action Plan**: {diag_action}")
     else:
         st.error("⚠️ Advanced insights data not found. Please run the ML pipeline first.")
 

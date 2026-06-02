@@ -87,10 +87,26 @@ def load_all_dashboard_data():
         except Exception:
             commits_count = 146333 # Fallback
             
-    return r_df, b_df, a_df, students_count, commits_count
+    # Load and calculate programming language distribution
+    repos_path = os.path.join(data_dir, 'repositories.csv')
+    lang_path = os.path.join(data_dir, 'languages.csv')
+    lang_dist_df = pd.DataFrame()
+    if os.path.exists(repos_path) and os.path.exists(lang_path):
+        try:
+            repos_df = pd.read_csv(repos_path)
+            lang_df = pd.read_csv(lang_path)
+            # Merge to map language names to repositories
+            merged_repos = repos_df.merge(lang_df, left_on='language_id', right_on='id', suffixes=('_repo', '_lang'))
+            # Get language distribution counts
+            lang_dist_df = merged_repos['name_lang'].value_counts().reset_index()
+            lang_dist_df.columns = ['Language', 'Project Count']
+        except Exception:
+            pass
+            
+    return r_df, b_df, a_df, students_count, commits_count, lang_dist_df
 
 # Load all data
-repo_df, burnout_df, adv_df, total_students, total_commits = load_all_dashboard_data()
+repo_df, burnout_df, adv_df, total_students, total_commits, lang_dist_df = load_all_dashboard_data()
 
 st.title("🎓 GitHub Projects Insights")
 st.markdown("### Mentorship Support System via Snowflake & AI")
@@ -179,10 +195,23 @@ with tab1:
             result = repo_df[repo_df['NAME'].str.contains(search_query, case=False, na=False)]
             st.dataframe(result[['NAME', 'status_grade', 'days_since_active', 'STARGAZERS_COUNT']], use_container_width=True)
             
-        # Visual breakdown of Grades
-        st.subheader("📊 Performance Grade Distribution")
-        grade_counts = repo_df['status_grade'].value_counts()
-        st.bar_chart(grade_counts)
+        # Visual breakdown of Grades and Programming Languages
+        st.divider()
+        col_grade, col_lang = st.columns(2)
+        
+        with col_grade:
+            st.subheader("📊 Performance Grade Distribution")
+            grade_counts = repo_df['status_grade'].value_counts()
+            st.bar_chart(grade_counts)
+            
+        with col_lang:
+            st.subheader("🔤 Programming Language Distribution")
+            if not lang_dist_df.empty:
+                # Show top 10 programming languages
+                top_langs = lang_dist_df.head(10).set_index('Language')
+                st.bar_chart(top_langs)
+            else:
+                st.info("Language distribution data not available.")
     else:
         st.error("⚠️ Project Progress report data not found. Please run the ML pipeline first.")
 

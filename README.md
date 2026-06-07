@@ -1,15 +1,15 @@
 # 🎓 GitHub Students Insights
 
-An end-to-end **Data Engineering & AI pipeline** that extracts GitHub activity data, loads it into **Snowflake**, and applies **Machine Learning models** to help academic mentors monitor student project progress — with final analytics delivered via **Power BI**.
+An end-to-end **Data Engineering & AI pipeline** that extracts GitHub activity data, loads it into **Snowflake**, and applies **Machine Learning models** to help academic mentors monitor student project progress — with final analytics delivered via an interactive **Streamlit Dashboard**.
 
 ---
 
 ## 🏗 Architecture
 
 ```
-GitHub API  →  Extract (Python)  →  CSVs  →  Snowflake  →  Power BI
+GitHub API  →  Extract (Python)  →  CSVs  →  Snowflake  →  Streamlit Dashboard
                                               ↓
-                                         ML Models  →  Streamlit Dashboard
+                                         ML Models
 ```
 
 | Stage | Tool | Description |
@@ -18,8 +18,7 @@ GitHub API  →  Extract (Python)  →  CSVs  →  Snowflake  →  Power BI
 | **Transform** | `normalize_data.py` | Flatten nested JSON into 7 normalized CSV tables |
 | **Load** | Snowflake Connector | Auto-create schema & bulk-load CSVs into cloud warehouse |
 | **Schedule** | Snowflake Tasks (CRON) | Automated data quality checks & analytics refresh |
-| **Analyze** | Power BI (DirectQuery) | Real-time dashboards connected to Snowflake |
-| **ML Insights** | scikit-learn + Streamlit | Burnout detection, PR prediction, project grading |
+| **Analyze & ML** | scikit-learn + Streamlit | Interactive dashboards for project grading, fatigue alerts, and PR predictions |
 
 ---
 
@@ -114,7 +113,7 @@ Github-Students-Insights/
 │
 ├── snowflake/                   # Snowflake data warehouse layer
 │   ├── load_to_snowflake.py     # Auto-creates DB, schema, tables & loads CSVs
-│   ├── create_snowflake_views.py# Creates Power BI-ready views
+│   ├── create_snowflake_views.py# Creates dashboard-ready views
 │   ├── snowflake_ddl.sql        # Table definitions (DDL)
 │   ├── snowflake_tasks.sql      # CRON-scheduled tasks for automated refresh
 │   └── power_bi_views.sql       # View definitions for dashboards
@@ -137,7 +136,7 @@ Github-Students-Insights/
 │   └── ...                      # users, authors, languages, user_types
 │
 └── docs/                        # Documentation
-    ├── power_bi_guide.md        # Power BI + Snowflake connection guide
+    ├── dashboard_layout_blueprint.md # Streamlit dashboard layout blueprint
     └── final_project_report.md  # Project report
 ```
 
@@ -149,7 +148,6 @@ Github-Students-Insights/
 - Python 3.10+
 - GitHub Personal Access Token ([create one](https://github.com/settings/tokens))
 - Snowflake Account (free trial works)
-- Power BI Desktop
 
 ### Installation
 
@@ -179,7 +177,7 @@ python main.py
 # Step 2: Load CSVs into Snowflake (auto-creates DB, schema & tables)
 python snowflake/load_to_snowflake.py
 
-# Step 3: Create Power BI views in Snowflake
+# Step 3: Create dashboard-ready views in Snowflake
 python snowflake/create_snowflake_views.py
 
 # Step 4: Train ML models
@@ -197,39 +195,18 @@ Run `snowflake/snowflake_tasks.sql` in your Snowflake worksheet to activate:
 
 ---
 
-## 📊 Power BI Integration
-
-Connect Power BI to Snowflake using DirectQuery for real-time dashboards:
-
-1. **Get Data** → **Snowflake**
-2. **Server**: `your-account.snowflakecomputing.com`
-3. **Warehouse**: `COMPUTE_WH`
-4. Select views: `DASHBOARD_REPO_SUMMARY`, `DASHBOARD_COMMIT_TRENDS`, `DASHBOARD_PR_INSIGHTS`
-
-See [`docs/power_bi_guide.md`](docs/power_bi_guide.md) for detailed instructions.
-
-### Suggested Visuals
-
-| Metric | Visual Type |
-|---|---|
-| Commit Velocity Over Time | Line Chart |
-| Language Distribution | Pie / Donut Chart |
-| PR Review Efficiency | Gauge / KPI Card |
-| Top Contributors | Bar Chart |
-| Repository Stars vs Forks | Scatter Plot |
-
----
-
 ## 🎓 Mentor Dashboard
 
-The Streamlit dashboard provides 4 tabs:
+The Streamlit dashboard provides 6 interactive tabs:
 
 | Tab | Feature |
 |---|---|
-| 🏗️ **Project Progress** | A–F grading for all student projects with search |
-| 🔥 **Student Fatigue Alert** | Flags overworked students needing mentor attention |
-| ⏳ **Submission Predictor** | Predicts PR merge time with interactive form |
-| 📊 **Strategy Insights** | Collaboration scores, velocity, risk heatmaps |
+| 📈 **Project Health Score** | AI-Clustered project health grades (A to D/F) based on activity and language distribution |
+| 🚨 **Risk Watchlist** | Identifies high-risk projects and provides AI mentor diagnostics |
+| 🤝 **Collaboration Index** | Work distribution metrics, contributor dependence, and inactivity warnings |
+| 🔥 **Burnout Analysis** | Weekend/late-night work pattern anomaly detection |
+| 🏆 **Project Ranking** | Batch-wide leaderboard sorting all projects by activity levels |
+| ⏳ **Submission Predictor** | AI predictor for estimating PR review and merge durations |
 
 ---
 
